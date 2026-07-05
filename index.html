@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>常州大学AI交流创新者协会</title>
+    <style>
+        /* ========== 基础重置 & 变量 ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0e1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2332;
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --secondary: #00cec9;
+            --accent-blue: #0984e3;
+            --accent-pink: #e84393;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: rgba(108, 92, 231, 0.2);
+            --glow: rgba(108, 92, 231, 0.15);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+
+        /* ========== 粒子背景 ========== */
+        #particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+            background: linear-gradient(135deg, #0a0e1a 0%, #16213e 50%, #0a0e1a 100%);
+        }
+        #particles::before {
+            content: '';
+            position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 20% 50%, rgba(108,92,231,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 50%, rgba(0,206,201,0.06) 0%, transparent 50%);
+        }
+
+        /* ========== 导航栏 ========== */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s;
+            background: transparent;
+        }
+        nav.scrolled {
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 40px;
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 18px; font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .nav-logo span { font-size: 24px; -webkit-text-fill-color: initial; }
+        .nav-links { display: flex; gap: 8px; align-items: center; }
+        .nav-links a {
+            color: var(--text-muted); text-decoration: none; font-size: 14px;
+            padding: 8px 16px; border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover {
+            color: var(--text); background: rgba(108,92,231,0.1);
+        }
+        .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+        .nav-toggle span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: 0.3s; }
+
+        /* ========== Hero 区域 ========== */
+        .hero {
+            position: relative; z-index: 1;
+            min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 120px 20px 60px;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 20px; border-radius: 100px;
+            background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(0,206,201,0.1));
+            border: 1px solid rgba(108,92,231,0.3);
+            font-size: 13px; color: var(--primary-light); margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-light) 40%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+        .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+        .btn {
+            padding: 14px 32px; border-radius: 12px; font-size: 15px; font-weight: 600;
+            text-decoration: none; transition: all 0.3s; cursor: pointer; border: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(108,92,231,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(108,92,231,0.4);
+        }
+        .btn-outline {
+            background: transparent; color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            background: rgba(108,92,231,0.1);
+            transform: translateY(-2px);
+        }
+        .scroll-down {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: var(--text-muted); font-size: 12px; cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+        .scroll-down .arrow { font-size: 20px; }
+        @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+
+        /* ========== 通用 Section ========== */
+        section { position: relative; z-index: 1; padding: 100px 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .section-title {
+            text-align: center; margin-bottom: 60px;
+        }
+        .section-title h2 {
+            font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .section-title p { color: var(--text-muted); font-size: 15px; max-width: 500px; margin: 0 auto; }
+
+        /* ========== 社团简介 ========== */
+        .about-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+        }
+        .about-content p {
+            color: var(--text-muted); font-size: 15px; margin-bottom: 16px;
+        }
+        .about-stats {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        .stat-card {
+            background: var(--bg-card); border-radius: 16px; padding: 28px 20px; text-align: center;
+            border: 1px solid var(--border); transition: all 0.3s;
+        }
+        .stat-card:hover {
+            border-color: var(--primary); transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--glow);
+        }
+        .stat-card .num {
+            font-size: 2rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .stat-card .label { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+        /* ========== 活动展示 ========== */
+        .activities-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;
+        }
+        .activity-card {
+            background: var(--bg-card); border-radius: 16px; padding: 32px;
+            border: 1px solid var(--border); transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .activity-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .activity-card:hover::before { opacity: 1; }
+        .activity-card:hover {
+            border-color: var(--primary); transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--glow);
+        }
+        .activity-card .icon { font-size: 2rem; margin-bottom: 16px; }
+        .activity-card h3 { font-size: 17px; margin-bottom: 8px; }
+        .activity-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+        .activity-card .tag {
+            display: inline-block; padding: 3px 10px; border-radius: 100px;
+            font-size: 11px; margin-top: 12px;
+            background: rgba(108,92,231,0.15); color: var(--primary-light);
+        }
+
+        /* ========== 加入我们 ========== */
+        .join-section {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(108,92,231,0.05) 0%, rgba(0,206,201,0.05) 100%);
+            border-radius: 24px; padding: 60px 40px; margin-top: 20px;
+            border: 1px solid var(--border);
+        }
+        .join-section h3 {
+            font-size: 1.5rem; margin-bottom: 12px;
+        }
+        .join-section p { color: var(--text-muted); margin-bottom: 16px; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .join-section .contact-info {
+            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 24px 0;
+        }
+        .contact-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 20px; border-radius: 12px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            color: var(--text); text-decoration: none; font-size: 14px;
+            transition: all 0.3s;
+        }
+        .contact-item:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .contact-item .c-icon { font-size: 18px; }
+
+        /* ========== 文章/学习资源 ========== */
+        .resources-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;
+        }
+        .resource-card {
+            background: var(--bg-card); border-radius: 16px; padding: 28px;
+            border: 1px solid var(--border); transition: all 0.3s;
+        }
+        .resource-card:hover {
+            border-color: var(--secondary); transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,206,201,0.1);
+        }
+        .resource-card .r-tag {
+            display: inline-block; padding: 3px 10px; border-radius: 100px;
+            font-size: 11px; margin-bottom: 12px;
+            background: rgba(0,206,201,0.15); color: var(--secondary);
+        }
+        .resource-card h3 { font-size: 16px; margin-bottom: 8px; }
+        .resource-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+        .resource-card .r-link { color: var(--primary-light); text-decoration: none; font-size: 13px; }
+        .resource-card .r-link:hover { text-decoration: underline; }
+
+        /* ========== AI工具箱 ========== */
+        .tools-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;
+        }
+        .tool-card {
+            background: var(--bg-card); border-radius: 14px; padding: 24px;
+            border: 1px solid var(--border); transition: all 0.3s; text-decoration: none; color: inherit;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+        .tool-card:hover {
+            border-color: var(--accent-blue); transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(9,132,227,0.1);
+        }
+        .tool-card .t-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .tool-card h4 { font-size: 15px; margin-bottom: 6px; }
+        .tool-card p { color: var(--text-muted); font-size: 12px; }
+
+        /* ========== 讨论/论坛 ========== */
+        .forum-placeholder {
+            background: var(--bg-card); border-radius: 16px; padding: 60px; text-align: center;
+            border: 2px dashed var(--border);
+        }
+        .forum-placeholder .f-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+        .forum-placeholder h3 { margin-bottom: 8px; }
+        .forum-placeholder p { color: var(--text-muted); font-size: 14px; margin-bottom: 16px; }
+
+        /* ========== 联系方式 ========== */
+        .contact-section {
+            text-align: center; padding-bottom: 60px;
+        }
+        .contact-section .links {
+            display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+        }
+
+        /* ========== Footer ========== */
+        footer {
+            position: relative; z-index: 1;
+            text-align: center; padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted); font-size: 13px;
+        }
+        footer .slogan {
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 15px; font-weight: 600; margin-bottom: 8px;
+        }
+
+        /* ========== 响应式 ========== */
+        /* ========== 滚动动画（AOS风格） ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .reveal-left.visible { opacity: 1; transform: translateX(0); }
+        .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .reveal-right.visible { opacity: 1; transform: translateX(0); }
+        .reveal-scale { opacity: 0; transform: scale(0.9); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+        /* ========== 3D倾斜卡片 ========== */
+        .tilt-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.15s ease-out;
+        }
+
+        /* ========== AI生成标题打字效果 ========== */
+        .hero h1 .typing-cursor::after {
+            content: '|';
+            animation: blink 0.8s step-end infinite;
+            color: var(--primary-light);
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* ========== 悬浮粒子层增强 ========== */
+        #neural-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 12px 20px; }
+            .nav-links {
+                display: none; position: fixed; top: 60px; left: 0; width: 100%;
+                flex-direction: column; background: rgba(10,14,26,0.98); backdrop-filter: blur(20px);
+                padding: 20px; border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .nav-toggle { display: flex; }
+            .about-grid { grid-template-columns: 1fr; }
+            .about-stats { grid-template-columns: 1fr 1fr; }
+            .activities-grid, .resources-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr 1fr; }
+            section { padding: 60px 16px; }
+            .join-section { padding: 40px 20px; }
+        }
+        @media (max-width: 480px) {
+            .tools-grid { grid-template-columns: 1fr; }
+            .about-stats { grid-template-columns: 1fr; }
+        }
+    
+        /* ========== 滚动动画 (AOS风格) ========== */
+        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .reveal-left.visible { opacity: 1; transform: translateX(0); }
+        .reveal-scale { opacity: 0; transform: scale(0.9); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .reveal-scale.visible { opacity: 1; transform: scale(1); }
+        
+        /* ========== 3D倾斜卡片 ========== */
+        .tilt-card { transform-style: preserve-3d; perspective: 1000px; transition: transform 0.15s ease-out; }
+        
+        /* ========== 神经网络粒子层 ========== */
+        #neural-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- 粒子背景 -->
+<div id="particles"></div>
+<div id="neural-particles"></div>
+
+<!-- 导航栏 -->
+<nav id="navbar">
+    <div class="nav-logo">
+        <span>🤖</span>
+        常大AI创新者协会
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="#about">社团简介</a>
+        <a href="#activities">活动展示</a>
+        <a href="#join">加入我们</a>
+        <a href="#resources">学习资源</a>
+        <a href="#tools">AI工具箱</a>
+        <a href="#forum">讨论区</a>
+        <a href="#contact">联系方式</a>
+    </div>
+    <div class="nav-toggle" id="navToggle" onclick="toggleNav()">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-badge">🏫 常州大学 · 校级社团</div>
+    <h1>常州大学<br>AI交流创新者协会</h1>
+    <p>汇聚AI热爱者，探索技术前沿，用创新思维连接每一个想法。无论你是小白还是大神，这里都有你的舞台。</p>
+    <div class="hero-actions">
+        <a href="#join" class="btn btn-primary">🚀 加入我们</a>
+        <a href="#about" class="btn btn-outline">📖 了解更多</a>
+    </div>
+    <div class="scroll-down">
+        <span>向下滚动</span>
+        <span class="arrow">↓</span>
+    </div>
+</section>
+
+<!-- 社团简介 -->
+<section id="about">
+    <div class="container">
+        <div class="section-title reveal">
+            <h2>关于我们</h2>
+            <p>智汇常大，创见未来</p>
+        </div>
+        <div class="about-grid">
+            <div class="about-content reveal-left">
+                <p>常州大学AI交流创新者协会是一个面向全校学生的综合性AI社团。我们致力于搭建一个集学习交流、项目实践、资源共享于一体的平台，让每一位对AI感兴趣的同学都能找到属于自己的成长路径。</p>
+                <p>在这里，无论你是刚接触AI的小白，还是已有基础的技术达人，都可以通过定期的技术分享、项目实战、竞赛交流和行业前沿讲座，拓展视野、提升能力。社团与学校保持紧密合作，拥有丰富的资源支持，为成员提供从理论到实践的完整成长闭环。</p>
+                <p>我们相信，AI不仅是技术，更是改变世界的力量。期待与你一起，探索AI的无限可能！</p>
+            </div>
+            <div class="about-stats">
+                <div class="stat-card tilt-card reveal-scale" style="transition-delay:0.1s">
+                    <div class="num">4+</div>
+                    <div class="label">核心成员</div>
+                </div>
+                <div class="stat-card tilt-card reveal-scale" style="transition-delay:0.2s">
+                    <div class="num">∞</div>
+                    <div class="label">无限可能</div>
+                </div>
+                <div class="stat-card tilt-card reveal-scale" style="transition-delay:0.3s">
+                    <div class="num">🎯</div>
+                    <div class="label">综合型定位</div>
+                </div>
+                <div class="stat-card tilt-card reveal-scale" style="transition-delay:0.4s">
+                    <div class="num">🏛️</div>
+                    <div class="label">学校支持</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 活动展示 -->
+<section id="activities">
+    <div class="container">
+        <div class="section-title reveal">
+            <h2>活动展示</h2>
+            <p>丰富多元的社团活动，总有一款适合你</p>
+        </div>
+        <div class="activities-grid">
+            <div class="activity-card tilt-card reveal" style="transition-delay:0.05s">
+                <div class="icon">💡</div>
+                <h3>AI技术分享会</h3>
+                <p>定期邀请校内外同学分享AI前沿技术、模型应用和实践经验，从理论到实操，干货满满。</p>
+                <span class="tag">每周一次</span>
+            </div>
+            <div class="activity-card tilt-card reveal" style="transition-delay:0.1s">
+                <div class="icon">🤝</div>
+                <h3>项目实战</h3>
+                <p>组队参与AI相关项目开发，从想法到产品，在实践中提升工程能力和协作经验。</p>
+                <span class="tag">学期项目</span>
+            </div>
+            <div class="activity-card tilt-card reveal" style="transition-delay:0.15s">
+                <div class="icon">🏆</div>
+                <h3>竞赛交流</h3>
+                <p>组队参加各类AI竞赛（天池、Kaggle等），以赛促学，在竞争中快速成长。</p>
+                <span class="tag">持续进行</span>
+            </div>
+            <div class="activity-card tilt-card reveal" style="transition-delay:0.2s">
+                <div class="icon">🎓</div>
+                <h3>AI入门工作坊</h3>
+                <p>为零基础同学设计的AI入门课程，涵盖Prompt工程、AI工具使用、基础模型原理等。</p>
+                <span class="tag">每月举办</span>
+            </div>
+            <div class="activity-card tilt-card reveal" style="transition-delay:0.25s">
+                <div class="icon">🔬</div>
+                <h3>前沿讲座</h3>
+                <p>邀请行业专家和优秀校友分享AI行业最新动态、职业发展和实践经验。</p>
+                <span class="tag">不定期</span>
+            </div>
+            <div class="activity-card tilt-card reveal" style="transition-delay:0.3s">
+                <div class="icon">🎉</div>
+                <h3>社团团建</h3>
+                <p>不仅有学习，还有丰富的团建活动，让志同道合的小伙伴在轻松氛围中交流。</p>
+                <span class="tag">定期举办</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 加入我们 -->
+<section id="join">
+    <div class="container">
+        <div class="section-title reveal">
+            <h2>加入我们</h2>
+            <p>一起探索AI的无限可能</p>
+        </div>
+        <div class="join-section reveal-scale">
+            <h3>🤖 欢迎你的加入！</h3>
+            <p>无论你是AI小白还是技术大神，只要你对AI充满热情，就快来加入我们吧！</p>
+            <div class="contact-info">
+                <a href="https://github.com/nhamlyjjus57-ops/cczu-ai-club" target="_blank" class="contact-item">
+                    <span class="c-icon">🐙</span> 社团GitHub
+                </a>
+                <a href="javascript:void(0)" class="contact-item" onclick="copyWechat()">
+                    <span class="c-icon">💬</span> 微信号：djz200716
+                </a>
+            </div>
+            <p style="font-size:13px; color:var(--text-muted);">👆 复制微信号添加联系人，备注"AI社团"</p>
+            <a href="#contact" class="btn btn-primary" style="margin-top: 8px;">📞 更多联系方式</a>
+        </div>
+    </div>
+</section>
+
+<!-- 文章/学习资源 -->
+<section id="resources">
+    <div class="container">
+        <div class="section-title reveal">
+            <h2>学习资源</h2>
+            <p>精选AI学习资料，助你快速入门到进阶</p>
+        </div>
+        <div class="resources-grid">
+            <div class="resource-card tilt-card reveal" style="transition-delay:0.05s">
+                <span class="r-tag">入门</span>
+                <h3>AI入门指南</h3>
+                <p>从零开始了解人工智能，涵盖机器学习、深度学习基础概念和常用术语解析。</p>
+                <a href="#" class="r-link">即将发布 →</a>
+            </div>
+            <div class="resource-card tilt-card reveal" style="transition-delay:0.1s">
+                <span class="r-tag">工具</span>
+                <h3>Prompt Engineering 教程</h3>
+                <p>学习如何高效使用大语言模型，掌握提示词工程的核心技巧和最佳实践。</p>
+                <a href="#" class="r-link">即将发布 →</a>
+            </div>
+            <div class="resource-card tilt-card reveal" style="transition-delay:0.15s">
+                <span class="r-tag">进阶</span>
+                <h3>经典论文解读</h3>
+                <p>社员共同解读AI领域经典论文，用通俗易懂的方式理解前沿研究。</p>
+                <a href="#" class="r-link">即将发布 →</a>
+            </div>
+            <div class="resource-card tilt-card reveal" style="transition-delay:0.2s">
+                <span class="r-tag">竞赛</span>
+                <h3>竞赛经验分享</h3>
+                <p>记录社员参与AI竞赛的实战经验，从数据预处理到模型优化全流程复盘。</p>
+                <a href="#" class="r-link">即将发布 →</a>
+            </div>
+            <div class="resource-card tilt-card reveal" style="transition-delay:0.25s">
+                <span class="r-tag">项目</span>
+                <h3>开源项目汇总</h3>
+                <p>整理AI领域值得学习的开源项目，附项目结构分析和代码解读。</p>
+                <a href="#" class="r-link">即将发布 →</a>
+            </div>
+            <div class="resource-card tilt-card reveal" style="transition-delay:0.3s">
+                <span class="r-tag">职业</span>
+                <h3>AI学习路线图</h3>
+                <p>从大一到大四，系统化的AI学习路线规划，含推荐课程、书籍和项目建议。</p>
+                <a href="#" class="r-link">即将发布 →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI工具箱 -->
+<section id="tools">
+    <div class="container">
+        <div class="section-title reveal">
+            <h2>AI工具箱</h2>
+            <p>精选好用AI工具，提升学习与工作效率</p>
+        </div>
+        <div class="tools-grid">
+            <a href="https://chat.openai.com" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.05s">
+                <div class="t-icon">🤖</div>
+                <h4>ChatGPT</h4>
+                <p>OpenAI 对话式AI助手</p>
+            </a>
+            <a href="https://claude.ai" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.1s">
+                <div class="t-icon">🧠</div>
+                <h4>Claude</h4>
+                <p>Anthropic AI助手</p>
+            </a>
+            <a href="https://www.deepseek.com" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.15s">
+                <div class="t-icon">🇨🇳</div>
+                <h4>DeepSeek</h4>
+                <p>国产大语言模型</p>
+            </a>
+            <a href="https://kimi.moonshot.cn" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.2s">
+                <div class="t-icon">📖</div>
+                <h4>Kimi</h4>
+                <p>长文本AI助手</p>
+            </a>
+            <a href="https://github.com/features/copilot" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.25s">
+                <div class="t-icon">💻</div>
+                <h4>GitHub Copilot</h4>
+                <p>AI编程助手</p>
+            </a>
+            <a href="https://www.midjourney.com" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.3s">
+                <div class="t-icon">🎨</div>
+                <h4>Midjourney</h4>
+                <p>AI图像生成工具</p>
+            </a>
+            <a href="https://huggingface.co" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.35s">
+                <div class="t-icon">🤗</div>
+                <h4>Hugging Face</h4>
+                <p>AI模型开源社区</p>
+            </a>
+            <a href="https://www.anthropic.com" target="_blank" class="tool-card tilt-card reveal" style="transition-delay:0.4s">
+                <div class="t-icon">⚡</div>
+                <h4>更多工具更新中</h4>
+                <p>持续收录优质AI工具</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 讨论/论坛 -->
+<section id="forum">
+    <div class="container">
+        <div class="section-title reveal">
+            <h2>讨论区</h2>
+            <p>社员交流互动，碰撞思想火花</p>
+        </div>
+        <div class="forum-placeholder reveal-scale">
+            <div class="f-icon">💬</div>
+            <h3>讨论区即将上线</h3>
+            <p>我们正在搭建社团专属讨论社区，敬请期待！<br>届时你可以在这里提问、分享、交流AI相关话题。</p>
+            <a href="#join" class="btn btn-outline">加入社团，第一时间获取更新</a>
+        </div>
+    </div>
+</section>
+
+<!-- 联系方式 -->
+<section id="contact">
+    <div class="container">
+        <div class="section-title reveal">
+            <h2>联系方式</h2>
+            <p>随时欢迎联系</p>
+        </div>
+        <div class="contact-section">
+            <div class="links">
+                <a href="javascript:void(0)" class="contact-item" onclick="copyWechat()">
+                    <span class="c-icon">💬</span> 微信号：djz200716
+                </a>
+                <a href="https://github.com/nhamlyjjus57-ops/cczu-ai-club" target="_blank" class="contact-item">
+                    <span class="c-icon">🐙</span> GitHub仓库
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="slogan">智汇常大，创见未来</div>
+    <p>© 2026 常州大学AI交流创新者协会 · All Rights Reserved</p>
+</footer>
+
+<script>
+    // 导航栏滚动效果
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // 移动端导航切换
+    function toggleNav() {
+        document.getElementById('navLinks').classList.toggle('open');
+    }
+    document.querySelectorAll('#navLinks a').forEach(a => {
+        a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+    });
+
+    // 复制微信号
+    function copyWechat() {
+        const text = 'djz200716';
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('\u2705 \u5fae\u4fe1\u53f7\u5df2\u590d\u5236\uff1a' + text);
+            }).catch(() => {
+                prompt('\u8bf7\u624b\u52a8\u590d\u5236\u5fae\u4fe1\u53f7\uff1a', text);
+            });
+        } else {
+            prompt('\u8bf7\u624b\u52a8\u590d\u5236\u5fae\u4fe1\u53f7\uff1a', text);
+        }
+    }
+
+    // ===== 滚动动画 IntersectionObserver =====
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-scale').forEach(el => observer.observe(el));
+
+    // ===== 3D倾斜卡片 =====
+    document.querySelectorAll('.tilt-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cx = rect.width / 2;
+            const cy = rect.height / 2;
+            const rx = ((y - cy) / cy) * -8;
+            const ry = ((x - cx) / cx) * 8;
+            card.style.transform = 'perspective(1000px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) scale3d(1.02,1.02,1.02)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+        });
+    });
+
+    // ===== 神经网络粒子 (Neural Network Style) =====
+    (function neuralNetwork() {
+        const container = document.getElementById('neural-particles');
+        if (!container) return;
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+        container.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const mouse = { x: -1000, y: -1000 };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        document.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+        // 神经网络分层结构
+        const layers = [4, 6, 9, 6, 4];
+        layers.forEach((count, li) => {
+            const lx = (li + 0.5) / layers.length * canvas.width;
+            for (let i = 0; i < count; i++) {
+                const y = (i + 0.5) / count * canvas.height;
+                particles.push({
+                    x: lx, y: y, ox: lx, oy: y,
+                    r: 2 + Math.random() * 2.5,
+                    layer: li, connections: []
+                });
+            }
+        });
+        // 跨层连接
+        for (let li = 0; li < layers.length - 1; li++) {
+            const cur = particles.filter(p => p.layer === li);
+            const nxt = particles.filter(p => p.layer === li + 1);
+            cur.forEach(c => { nxt.forEach(n => { c.connections.push(n); }); });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const maxDist = Math.hypot(canvas.width, canvas.height) * 0.25;
+
+            // 连接线
+            particles.forEach(p => {
+                p.connections.forEach(t => {
+                    const dx = t.x - p.x, dy = t.y - p.y;
+                    const d = Math.hypot(dx, dy);
+                    if (d < maxDist) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(t.x, t.y);
+                        ctx.strokeStyle = 'rgba(108, 92, 231, ' + (0.15 * (1 - d / maxDist)) + ')';
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            particles.forEach(p => {
+                // 鼠标交互
+                const dx = p.x - mouse.x, dy = p.y - mouse.y;
+                const d = Math.hypot(dx, dy);
+                if (d < 200 && d > 0) {
+                    const f = (200 - d) / 200 * 0.5;
+                    p.x += (dx / d) * f;
+                    p.y += (dy / d) * f;
+                }
+                // 弹性恢复
+                p.x += (p.ox - p.x) * 0.01;
+                p.y += (p.oy - p.y) * 0.01;
+
+                // 辉光
+                const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+                g.addColorStop(0, 'rgba(162, 155, 254, 0.8)');
+                g.addColorStop(1, 'rgba(108, 92, 231, 0)');
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+                ctx.fillStyle = g;
+                ctx.fill();
+
+                // 核心
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r * 0.6, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(162, 155, 254, 0.9)';
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
+
+    // ===== 原始粒子背景 =====
+    (function origParticles() {
+        const container = document.getElementById('particles');
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+        container.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        let p = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+        for (let i = 0; i < 60; i++) {
+            p.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5, r: Math.random()*2+1, a: Math.random()*0.5+0.1 });
+        }
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            p.forEach(pt => {
+                pt.x += pt.vx; pt.y += pt.vy;
+                if (pt.x < 0) pt.x = canvas.width;
+                if (pt.x > canvas.width) pt.x = 0;
+                if (pt.y < 0) pt.y = canvas.height;
+                if (pt.y > canvas.height) pt.y = 0;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI*2);
+                ctx.fillStyle = 'rgba(162,155,254,' + pt.a + ')';
+                ctx.fill();
+            });
+            for (let i = 0; i < p.length; i++) {
+                for (let j = i+1; j < p.length; j++) {
+                    const dx = p[i].x - p[j].x, dy = p[i].y - p[j].y;
+                    const d = Math.hypot(dx, dy);
+                    if (d < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p[i].x, p[i].y);
+                        ctx.lineTo(p[j].x, p[j].y);
+                        ctx.strokeStyle = 'rgba(108,92,231,' + (0.08*(1-d/150)) + ')';
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+</script>
+</body>
+</html>
